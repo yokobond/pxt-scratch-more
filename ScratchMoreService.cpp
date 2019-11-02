@@ -78,6 +78,12 @@ ScratchMoreService::ScratchMoreService(MicroBit &_uBit)
     EventModel::defaultEventBus->listen(MICROBIT_ID_ACCELEROMETER, MICROBIT_ACCELEROMETER_EVT_DATA_UPDATE, this, &ScratchMoreService::onAccelerometerChanged, MESSAGE_BUS_LISTENER_IMMEDIATE);
   }
 
+  // Setup magnetic pulse counter. 
+  magneticPulseCounter = new MagneticPulseCounter(uBit);
+  magneticPulseCounter->setStrengthThreshold(200);
+  uBit.messageBus.listen(MAGNETIC_PULSE_ID, MAGNETIC_PULSE_EVT_PULSE_LO, this, &ScratchMoreService::onMagneticPulse, MESSAGE_BUS_LISTENER_DROP_IF_BUSY);
+  create_fiber(MagneticPulseCounter::StartMagneticPulseCount);
+
   uBit.ble->onDataWritten(this, &ScratchMoreService::onDataWritten);
 
   uBit.messageBus.listen(MICROBIT_ID_BLE, MICROBIT_BLE_EVT_CONNECTED, this, &ScratchMoreService::onBLEConnected, MESSAGE_BUS_LISTENER_IMMEDIATE);
@@ -363,6 +369,8 @@ void ScratchMoreService::composeTxBuffer02()
 {
   composeDefaultData(txBuffer02);
 
+  // txBuffer02[10..17] = slot[0..3]
+
   txBuffer02[18] = 0;
   for (size_t i = 0; i < 8; i++)
   {
@@ -459,6 +467,14 @@ void ScratchMoreService::displayFriendlyName()
 {
   ManagedString suffix(" MORE! ");
   uBit.display.scrollAsync(uBit.getName() + suffix, 120);
+}
+
+void ScratchMoreService::onMagneticPulse(MicroBitEvent e)
+{
+  if (e.value == MAGNETIC_PULSE_EVT_PULSE_LO) {
+    magneticPulseWidth = e.timestamp;
+    setSlot(0, (int)magneticPulseWidth); // for test
+  }
 }
 
 const uint16_t ScratchMoreServiceUUID = 0xf005;

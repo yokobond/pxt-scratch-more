@@ -3,6 +3,8 @@
 
 #include "MicroBit.h"
 
+#include "MagneticPulseCounter.h"
+
 #define SCRATCH_MORE_ID 2000
 
 #define SCRATCH_MORE_EVT_NOTIFY 1
@@ -18,6 +20,7 @@ extern const uint8_t ScratchMoreServiceRxUUID[];
   */
 class ScratchMoreService
 {
+
 public:
   /**
     * Constructor.
@@ -53,6 +56,12 @@ public:
 
   void updateDigitalValues();
   void updateAnalogValues();
+
+  /**
+   * Invocked from MagneticPulseCounter. 
+   */
+  void onMagneticPulse(MicroBitEvent e);
+
 
 private:
   // Sending data to Scratch3.
@@ -101,10 +110,17 @@ private:
 
   uint16_t analogValues[6];
 
+  uint64_t magneticPulseWidth;
+
   /**
    * Slots
    */
   int16_t slots[4];
+
+  /**
+   * magnetic force strength pulse
+   */
+  MagneticPulseCounter* magneticPulseCounter;
 
   void setInputMode(int pinIndex);
   void setDigitalValue(int pinIndex, int value);

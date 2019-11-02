@@ -13,7 +13,9 @@
         "extension.ts",
         "extension.cpp",
         "ScratchMoreService.h",
-        "ScratchMoreService.cpp"
+        "ScratchMoreService.cpp",
+        "MagneticPulseCounter.h",
+        "MagneticPulseCounter.cpp"
     ],
     "testFiles": [
         "test.ts"
