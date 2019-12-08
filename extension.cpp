@@ -2,6 +2,7 @@
 #include "ScratchMoreService.h"
 
 #define NOTIFY_PERIOD 100
+#define RESET_LIGHT_SENSOR_PERIOD 300000
 
 enum Slot {
     //% block="slot0"
@@ -30,6 +31,14 @@ namespace ScratchMore {
         }
     }
 
+    void resetLightSensor() {
+        while (NULL != _pService) {
+            // wait period
+            fiber_sleep(RESET_LIGHT_SENSOR_PERIOD);
+            _pService->resetLightSensor();
+        }
+    }
+
     /**
     * Starts a Scratch extension service.
     * The handler can call ``setscratchMoreSlot`` to send any data to Scratch.
@@ -42,6 +51,7 @@ namespace ScratchMore {
         _handler = handler;
         pxt::incr(_handler);
         create_fiber(notifyScratch);
+        create_fiber(resetLightSensor);
     }
 
     /**

@@ -54,6 +54,8 @@ public:
   void updateDigitalValues();
   void updateAnalogValues();
 
+  void resetLightSensor();
+
 private:
   // Sending data to Scratch3.
   uint8_t txData[20];

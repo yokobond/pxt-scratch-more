@@ -291,6 +291,11 @@ void ScratchMoreService::updateAnalogValues()
   // uBit.display.enable();
 }
 
+void ScratchMoreService::resetLightSensor()
+{
+    uBit.display.setDisplayMode(DISPLAY_MODE_BLACK_AND_WHITE);
+}
+
 void ScratchMoreService::setInputMode(int pinIndex)
 {
   uBit.io.pin[pinIndex].getDigitalValue(); // Configure the pin as input, but the value is not used.
