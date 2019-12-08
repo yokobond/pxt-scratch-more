@@ -7,6 +7,25 @@
 int gpio[] = {0, 1, 2, 8, 13, 14, 15, 16};
 int analogIn[] = {0, 1, 2};
 
+int compareInt(const void *a, const void *b) {
+  return *(int *)a - *(int *)b;
+}
+
+int getMedian(const int* array, size_t length) {
+  int* array_copy = (int *)malloc(sizeof(int) * length);
+  memcpy(array_copy, array, sizeof(int) * length);
+  qsort(array_copy, length, sizeof(int), compareInt);
+  int median;
+  if (length % 2 == 1) {
+      median = array_copy[length / 2];
+  }
+  else {
+      median = (array_copy[length / 2 - 1] + array_copy[length / 2]) / 2;
+  }
+  free(array_copy);
+  return median;
+}
+
 /**
   * Constructor.
   * Create a representation of the ScratchMoreService
@@ -291,6 +310,21 @@ void ScratchMoreService::updateAnalogValues()
   // uBit.display.enable();
 }
 
+void ScratchMoreService::updateLightLevel()
+{
+  for (size_t i = 0; i < LIGHT_LEVEL_BUFFER_LENGTH - 1; i++)
+  {
+    lightLevelBuffer[i + 1] = lightLevelBuffer[i];
+  }
+  lightLevelBuffer[0] = uBit.display.readLightLevel();
+}
+
+int ScratchMoreService::getLightLevel()
+{
+  updateLightLevel();
+  return getMedian(lightLevelBuffer, LIGHT_LEVEL_BUFFER_LENGTH);
+}
+
 void ScratchMoreService::resetLightSensor()
 {
     uBit.display.setDisplayMode(DISPLAY_MODE_BLACK_AND_WHITE);
@@ -358,7 +392,7 @@ void ScratchMoreService::composeTxBuffer01()
   memcpy(&(txBuffer01[16]), &heading, 2);
 
   // level of light amount (0-255) is sent as uint8_t.
-  txBuffer01[18] = (uint8_t)uBit.display.readLightLevel();
+  txBuffer01[18] = (uint8_t)getLightLevel();
 
   // More extension format.
   txBuffer01[19] = 0x01;

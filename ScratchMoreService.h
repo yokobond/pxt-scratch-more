@@ -7,6 +7,8 @@
 
 #define SCRATCH_MORE_EVT_NOTIFY 1
 
+#define LIGHT_LEVEL_BUFFER_LENGTH 10
+
 // UUIDs for our service and characteristics
 extern const uint16_t ScratchMoreServiceUUID;
 extern const uint8_t ScratchMoreServiceTxUUID[];
@@ -108,6 +110,8 @@ private:
    */
   int16_t slots[4];
 
+  int lightLevelBuffer[LIGHT_LEVEL_BUFFER_LENGTH];
+
   void setInputMode(int pinIndex);
   void setDigitalValue(int pinIndex, int value);
   void setAnalogValue(int pinIndex, int value);
@@ -118,6 +122,9 @@ private:
 
   void updateGesture(void);
   void resetGesture(void);
+
+  void updateLightLevel();
+  int getLightLevel();
 
   int normalizeCompassHeading(int heading);
   int convertToTilt(float radians);
